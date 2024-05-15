@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 
 import com.unity.goods.domain.member.entity.Member;
 import com.unity.goods.domain.member.repository.MemberRepository;
+import com.unity.goods.domain.point.dto.PointBalanceDto.PointBalanceResponse;
 import com.unity.goods.domain.point.dto.PointChargeDto.PointChargeRequest;
 import com.unity.goods.domain.point.dto.PointChargeDto.PointChargeResponse;
 import com.unity.goods.domain.point.entity.Point;
@@ -90,6 +91,53 @@ class PointServiceTest {
     verify(pointRepository).save(pointCaptor.capture());
     Point savedPoint = pointCaptor.getValue();
     assertEquals(5000L, savedPoint.getBalance());
+  }
+
+  @Test
+  @DisplayName("충전 이력 O 유저 포인트 잔액 조회")
+  void getBalanceTest() {
+    // given
+    Member member = Member.builder()
+        .id(1L)
+        .email("test@email.com")
+        .build();
+
+    Point point = Point.builder()
+        .member(member)
+        .balance(1000L)
+        .build();
+
+    UserDetailsImpl userDetails = new UserDetailsImpl(member);
+
+    given(memberRepository.findByEmail(any(String.class))).willReturn(Optional.of(member));
+    given(pointRepository.findByMember(any(Member.class))).willReturn(Optional.of(point));
+
+    // when
+    PointBalanceResponse pointBalanceResponse = pointService.getBalance(userDetails);
+
+    // then
+    assertEquals(1000L, Long.parseLong(pointBalanceResponse.getPrice()));
+  }
+
+  @Test
+  @DisplayName("포인트 충전 이력 X 유저 포인트 잔액 조회")
+  void getFirstBalanceTest() {
+    // given
+    Member member = Member.builder()
+        .id(1L)
+        .email("test@email.com")
+        .build();
+
+    UserDetailsImpl userDetails = new UserDetailsImpl(member);
+
+    given(memberRepository.findByEmail(any(String.class))).willReturn(Optional.of(member));
+    given(pointRepository.findByMember(any(Member.class))).willReturn(Optional.empty());
+
+    // when
+    PointBalanceResponse pointBalanceResponse = pointService.getBalance(userDetails);
+
+    // then
+    assertEquals(0L, Long.parseLong(pointBalanceResponse.getPrice()));
   }
 
 }
