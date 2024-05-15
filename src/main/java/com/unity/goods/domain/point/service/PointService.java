@@ -5,6 +5,7 @@ import static com.unity.goods.global.exception.ErrorCode.USER_NOT_FOUND;
 import com.unity.goods.domain.member.entity.Member;
 import com.unity.goods.domain.member.exception.MemberException;
 import com.unity.goods.domain.member.repository.MemberRepository;
+import com.unity.goods.domain.point.dto.PointBalanceDto.PointBalanceResponse;
 import com.unity.goods.domain.point.dto.PointChargeDto.PointChargeRequest;
 import com.unity.goods.domain.point.dto.PointChargeDto.PointChargeResponse;
 import com.unity.goods.domain.point.entity.Point;
@@ -44,6 +45,20 @@ public class PointService {
 
     pointRepository.save(chargePoint);
     return PointChargeResponse.builder().paymentStatus(String.valueOf(PaymentStatus.SUCCESS))
+        .build();
+  }
+
+  public PointBalanceResponse getBalance(UserDetailsImpl member) {
+
+    Member findMember = memberRepository.findByEmail(member.getUsername())
+        .orElseThrow(() -> new MemberException(USER_NOT_FOUND));
+
+    Optional<Point> optionalPoint = pointRepository.findByMember(findMember);
+    if (optionalPoint.isEmpty()) {
+      return PointBalanceResponse.builder().price("0").build();
+    }
+
+    return PointBalanceResponse.builder().price(optionalPoint.get().getBalance().toString())
         .build();
   }
 }

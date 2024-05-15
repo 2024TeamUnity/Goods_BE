@@ -1,5 +1,6 @@
 package com.unity.goods.domain.point.controller;
 
+import com.unity.goods.domain.point.dto.PointBalanceDto.PointBalanceResponse;
 import com.unity.goods.domain.point.dto.PointChargeDto;
 import com.unity.goods.domain.point.dto.PointChargeDto.PointChargeResponse;
 import com.unity.goods.domain.point.service.PointService;
@@ -8,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +29,12 @@ public class PointController {
   ) {
     PointChargeResponse pointChargeResponse = pointService.chargePoint(member, pointChargeRequest);
     return ResponseEntity.ok(pointChargeResponse);
+  }
+
+  @GetMapping("/balance")
+  public ResponseEntity<?> getBalance(@AuthenticationPrincipal UserDetailsImpl member) {
+    PointBalanceResponse pointBalanceResponse = pointService.getBalance(member);
+    return ResponseEntity.ok(pointBalanceResponse);
   }
 
 }
