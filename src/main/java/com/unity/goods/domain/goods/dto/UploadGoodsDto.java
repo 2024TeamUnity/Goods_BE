@@ -24,7 +24,7 @@ public class UploadGoodsDto {
     private List<MultipartFile> goodsImageFiles;
 
     @NotBlank(message = "상품 가격을 입력해주세요.")
-    @Pattern(regexp = "^[1-9][0-9]*$", message = "가격은 0으로 시작하지 않는 숫자로 입력해야 합니다.")
+    @Pattern(regexp = "^[1-9][0-9]*$", message = "가격은 0또는 (-)로 시작하지 않는 숫자로 입력해야 합니다.")
     private String price;
 
     @NotBlank(message = "상품명을 입력해주세요.")
